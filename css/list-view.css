@@ -1,0 +1,194 @@
+/* List View Styles */
+.list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+}
+
+.list-view .anime-card {
+    display: flex;
+    padding: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.list-view .anime-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: transparent;
+    transition: background-color 0.3s ease;
+}
+
+.list-view .anime-card:hover {
+    transform: translateX(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #e0e0e0;
+}
+
+.list-view .anime-card:hover::before {
+    background-color: #0d6efd;
+}
+
+.list-view .anime-cover {
+    width: 85px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+}
+
+.list-view .anime-card:hover .anime-cover {
+    transform: scale(1.05);
+}
+
+.list-view .anime-info {
+    margin-left: 1.25rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.list-view .anime-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.list-view .anime-info h5 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.list-view .anime-card:hover .anime-info h5 {
+    color: #0d6efd;
+}
+
+.list-view .controls-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: auto;
+}
+
+.list-view .status-select {
+    min-width: 120px;
+    max-width: 150px;
+}
+
+.list-view .episode-counter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+}
+
+.list-view .episode-input {
+    width: 60px;
+    text-align: center;
+}
+
+.list-view .remove-btn {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.3s ease;
+    background: none;
+    border: none;
+    color: #dc3545;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.list-view .remove-btn i {
+    font-size: 1.1rem;
+}
+
+.list-view .anime-card:hover .remove-btn {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.list-view .remove-btn:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.list-view .anime-type {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.list-view .anime-type::after {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background-color: #666;
+    border-radius: 50%;
+}
+
+.list-view .progress-container {
+    margin-top: 0.75rem;
+    background: #f0f0f0;
+    height: 4px;
+    border-radius: 2px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 300px;
+}
+
+.list-view .progress-bar {
+    height: 100%;
+    background: #198754;
+    transform-origin: left;
+    transition: width 0.6s ease-out;
+}
+
+/* Responsive adjustments for list view */
+@media (max-width: 768px) {
+    .list-view .anime-card {
+        padding: 0.75rem;
+    }
+
+    .list-view .anime-cover {
+        width: 70px;
+        height: 100px;
+    }
+
+    .list-view .anime-info {
+        margin-left: 1rem;
+    }
+
+    .list-view .anime-info h5 {
+        font-size: 1rem;
+    }
+
+    .list-view .controls-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .list-view .status-select {
+        width: 100%;
+        max-width: none;
+    }
+}

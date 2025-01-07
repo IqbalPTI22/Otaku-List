@@ -1,0 +1,404 @@
+/* Import view-specific styles */
+@import url('grid-view.css');
+@import url('list-view.css');
+
+/* Base styles */
+:root {
+    --card-transition: 0.3s ease;
+    --overlay-bg: rgba(0, 0, 0, 0.7);
+    --progress-height: 3px;
+    --card-border-radius: 8px;
+}
+
+/* Common Styles */
+.search-container {
+    position: relative;
+    margin: 0.5rem 0;
+}
+
+.search-container .input-group {
+    margin-bottom: 0;
+}
+
+.search-container .input-group-text {
+    background: white;
+    padding: 0.4rem 0.75rem;
+}
+
+.search-container .form-control {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.95rem;
+}
+
+#searchResults {
+    position: absolute;
+    width: 100%;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: var(--card-border-radius);
+    z-index: 1000;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-result-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color var(--card-transition);
+}
+
+.search-result-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* View Toggle Buttons */
+#gridViewBtn.active,
+#listViewBtn.active {
+    background-color: #6c757d;
+    color: white;
+    border-color: #6c757d;
+    transition: all var(--card-transition);
+}
+
+/* Loading animation */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--card-transition), visibility var(--card-transition);
+}
+
+.loading-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.list-view .anime-card {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.list-view .list-card-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+}
+
+.list-view .anime-cover-container {
+    width: 50px;
+    height: 70px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.list-view .anime-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 2px;
+}
+
+.list-view .image-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.list-view .anime-details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.list-view .anime-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list-view .anime-info-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: nowrap;
+}
+
+.list-view .anime-type {
+    color: #666;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.list-view .status-select {
+    width: auto;
+    min-width: 120px;
+}
+
+.list-view .episode-counter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.list-view .episode-input {
+    width: 60px;
+}
+
+.list-view .episode-total {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.list-view .progress {
+    height: 3px;
+    background: #e9ecef;
+    border-radius: 1.5px;
+    overflow: hidden;
+    margin-top: -2px;
+}
+
+.list-view .progress-bar {
+    height: 100%;
+    background: #28a745;
+    transition: width 0.3s ease;
+}
+
+.list-view .remove-btn {
+    padding: 0.25rem;
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    margin-left: auto;
+}
+
+.list-view .remove-btn:hover {
+    color: #c82333;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.header-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.view-controls {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.view-controls .btn {
+    padding: 0.35rem 0.5rem;
+}
+
+.header-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.header-actions .btn {
+    width: 100%;
+    padding: 0.4rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+
+.header-actions .btn i {
+    font-size: 1rem;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .list-view .list-card-content {
+        padding: 0.5rem;
+        gap: 0.75rem;
+    }
+
+    .list-view .anime-cover-container {
+        width: 45px;
+        height: 65px;
+    }
+
+    .list-view .anime-title {
+        font-size: 0.95rem;
+    }
+
+    .list-view .anime-info-row {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .list-view .anime-type {
+        font-size: 0.8rem;
+        order: 1;
+    }
+
+    .list-view .status-select {
+        min-width: 100px;
+        font-size: 0.85rem;
+        order: 2;
+    }
+
+    .list-view .episode-counter {
+        order: 3;
+        font-size: 0.85rem;
+    }
+
+    .list-view .episode-input {
+        width: 45px;
+        padding: 0.25rem;
+    }
+
+    .list-view .remove-btn {
+        padding: 0.15rem;
+        font-size: 0.85rem;
+        order: 4;
+    }
+
+    .list-view .progress {
+        margin-top: 0.25rem;
+    }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+    .header {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .header-title {
+        font-size: 1.15rem;
+    }
+
+    .view-controls .btn {
+        padding: 0.3rem 0.4rem;
+    }
+
+    .header-actions {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.35rem;
+    }
+
+    .header-actions .btn {
+        padding: 0.35rem;
+        font-size: 0.85rem;
+    }
+
+    .header-actions .btn i {
+        font-size: 0.95rem;
+    }
+
+    .list-view .anime-info-row {
+        gap: 0.35rem;
+    }
+
+    .list-view .status-select {
+        min-width: 90px;
+    }
+
+    .list-view .episode-input {
+        width: 40px;
+    }
+
+    .list-view .episode-total {
+        font-size: 0.8rem;
+    }
+}
+
+.footer {
+    text-align: center;
+    padding: 1rem;
+    margin-top: 2rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.footer a {
+    color: #6c757d;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer a:hover {
+    color: #495057;
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+    .footer {
+        padding: 0.75rem;
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+    }
+}

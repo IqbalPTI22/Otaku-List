@@ -255,21 +255,34 @@ function renderSearchMessage(message, isError = false) {
 
 async function fetchAnimeSearchResults(query, signal) {
     const jikanUrl = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=5`;
-    const fallbackUrl = `https://corsproxy.io/?${encodeURIComponent(jikanUrl)}`;
-    const urls = [jikanUrl, fallbackUrl];
+    const urls = [
+        jikanUrl,
+        `https://corsproxy.io/?${encodeURIComponent(jikanUrl)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(jikanUrl)}`
+    ];
     let lastError = null;
 
     for (const url of urls) {
         try {
             const response = await fetch(url, { signal });
             const responseText = await response.text();
-            const data = responseText ? JSON.parse(responseText) : {};
+            let data = responseText ? JSON.parse(responseText) : {};
+
+            if (typeof data?.contents === 'string') {
+                data = JSON.parse(data.contents);
+            } else if (data?.contents && typeof data.contents === 'object') {
+                data = data.contents;
+            }
 
             if (!response.ok) {
                 throw new Error(data?.message || `Request failed (${response.status})`);
             }
 
-            return data;
+            if (Array.isArray(data?.data)) {
+                return data;
+            }
+
+            throw new Error('Invalid API response');
         } catch (error) {
             if (error.name === 'AbortError') throw error;
             lastError = error;

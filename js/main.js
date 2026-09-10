@@ -244,40 +244,97 @@ function renderAnimeCard(anime) {
     return card;
 }
 
+let searchController = null;
+
+function renderSearchMessage(message, isError = false) {
+    const resultsDiv = document.getElementById('searchResults');
+    if (!resultsDiv) return;
+
+    resultsDiv.innerHTML = `<div class="search-result-item ${isError ? 'text-danger' : 'text-muted'}">${message}</div>`;
+}
+
+async function fetchAnimeSearchResults(query, signal) {
+    const jikanUrl = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=5`;
+    const fallbackUrl = `https://corsproxy.io/?${encodeURIComponent(jikanUrl)}`;
+    const urls = [jikanUrl, fallbackUrl];
+    let lastError = null;
+
+    for (const url of urls) {
+        try {
+            const response = await fetch(url, { signal });
+            const responseText = await response.text();
+            const data = responseText ? JSON.parse(responseText) : {};
+
+            if (!response.ok) {
+                throw new Error(data?.message || `Request failed (${response.status})`);
+            }
+
+            return data;
+        } catch (error) {
+            if (error.name === 'AbortError') throw error;
+            lastError = error;
+        }
+    }
+
+    throw lastError || new Error('Request failed');
+}
+
 // Search anime using Jikan API
-function searchAnime(query) {
-    if (!query) {
-        document.getElementById('searchResults').innerHTML = '';
+async function searchAnime(query) {
+    const resultsDiv = document.getElementById('searchResults');
+    if (!resultsDiv) return;
+
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) {
+        resultsDiv.innerHTML = '';
+        if (searchController) searchController.abort();
         return;
     }
 
-    try {
-        fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=5`)
-            .then(response => response.json())
-            .then(data => {
-                const resultsDiv = document.getElementById('searchResults');
-                resultsDiv.innerHTML = '';
+    if (searchController) searchController.abort();
+    searchController = new AbortController();
 
-                data.data.forEach(anime => {
-                    const div = document.createElement('div');
-                    div.className = 'search-result-item';
-                    div.innerHTML = `
-                        <div class="d-flex align-items-center">
-                            <img src="${anime.images.jpg.small_image_url}" style="width: 50px; margin-right: 10px;">
-                            <div>
-                                <strong>${anime.title}</strong>
-                                <br>
-                                <small>${anime.type} (${anime.episodes} eps)</small>
-                            </div>
-                        </div>
-                    `;
-                    div.onclick = () => addAnime(anime);
-                    resultsDiv.appendChild(div);
-                });
-            })
-            .catch(error => console.error('Error searching anime:', error));
+    try {
+        const data = await fetchAnimeSearchResults(trimmedQuery, searchController.signal);
+
+        const results = Array.isArray(data?.data) ? data.data : [];
+        resultsDiv.innerHTML = '';
+
+        if (!results.length) {
+            renderSearchMessage('No anime found.');
+            return;
+        }
+
+        results.forEach(anime => {
+            const div = document.createElement('div');
+            const imageUrl = anime?.images?.jpg?.small_image_url || anime?.images?.webp?.small_image_url || 'images/placeholder.jpg';
+            const episodes = anime?.episodes ?? '?';
+            const type = anime?.type || 'Unknown';
+            const title = anime?.title || 'Unknown title';
+
+            div.className = 'search-result-item';
+            div.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <img src="${imageUrl}" style="width: 50px; margin-right: 10px;">
+                    <div>
+                        <strong>${title}</strong>
+                        <br>
+                        <small>${type} (${episodes} eps)</small>
+                    </div>
+                </div>
+            `;
+            div.onclick = () => addAnime(anime);
+            resultsDiv.appendChild(div);
+        });
     } catch (error) {
+        if (error.name === 'AbortError') return;
         console.error('Error searching anime:', error);
+        const message = error.message.includes('429')
+            ? 'Rate limit reached. Please wait a moment and try again.'
+            : 'Failed to search anime. Please try again.';
+        renderSearchMessage(message, true);
+    } finally {
+        searchController = null;
     }
 }
 
@@ -305,7 +362,7 @@ function addAnime(anime) {
         const animeData = {
             mal_id: anime.mal_id,
             title: anime.title,
-            image_url: anime.images.jpg.large_image_url, 
+            image_url: anime.images?.jpg?.large_image_url || anime.images?.webp?.large_image_url || anime.images?.jpg?.image_url || 'images/placeholder.jpg',
             episodes: anime.episodes,
             type: anime.type,
             status: 'Planning', 

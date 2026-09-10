@@ -253,6 +253,32 @@ function renderSearchMessage(message, isError = false) {
     resultsDiv.innerHTML = `<div class="search-result-item ${isError ? 'text-danger' : 'text-muted'}">${message}</div>`;
 }
 
+async function fetchAnimeSearchResults(query, signal) {
+    const jikanUrl = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=5`;
+    const fallbackUrl = `https://corsproxy.io/?${encodeURIComponent(jikanUrl)}`;
+    const urls = [jikanUrl, fallbackUrl];
+    let lastError = null;
+
+    for (const url of urls) {
+        try {
+            const response = await fetch(url, { signal });
+            const responseText = await response.text();
+            const data = responseText ? JSON.parse(responseText) : {};
+
+            if (!response.ok) {
+                throw new Error(data?.message || `Request failed (${response.status})`);
+            }
+
+            return data;
+        } catch (error) {
+            if (error.name === 'AbortError') throw error;
+            lastError = error;
+        }
+    }
+
+    throw lastError || new Error('Request failed');
+}
+
 // Search anime using Jikan API
 async function searchAnime(query) {
     const resultsDiv = document.getElementById('searchResults');
@@ -269,14 +295,7 @@ async function searchAnime(query) {
     searchController = new AbortController();
 
     try {
-        const response = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(trimmedQuery)}&limit=5`, {
-            signal: searchController.signal
-        });
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data?.message || `Request failed (${response.status})`);
-        }
+        const data = await fetchAnimeSearchResults(trimmedQuery, searchController.signal);
 
         const results = Array.isArray(data?.data) ? data.data : [];
         resultsDiv.innerHTML = '';
